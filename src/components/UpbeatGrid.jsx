@@ -3,12 +3,14 @@ import isEmpty from "lodash/isEmpty";
 import times from "lodash/times";
 import isFunction from "lodash/isFunction";
 import Hexagon from "react-hexagon";
+import Draggable from 'react-draggable';
+import clsx from 'clsx';
 
-function UpbeatGrid() {
-  const rows = 5;
-  const cols = 5;
-  let hexagons = times(rows, (row) => times(cols, (col) => (col) + (cols * row)));
-  const gridWidth = 500;
+function UpbeatGrid({ Rows, Cols, GridWidth, containerWidth, containerHeight }) {
+  const rows = Rows;
+  const cols = Cols;
+  let hexagons = times(rows, (row) => times(cols, (col) => /*(col) + (cols * row)*/`( ${row},${col} )`));
+  const gridWidth = GridWidth;
   const colsWidth = gridWidth * (4 / (4 + 3 * (cols - 1)))
   const gridHeight = ((colsWidth / 4) * (3 / Math.sqrt(3)) * (1 + 2 * rows))
   const hexSize = gridWidth / (cols * 1.5 + 0.5);
@@ -43,7 +45,7 @@ function UpbeatGrid() {
         fill: "#007aff",
         stroke: "white"
       },
-      onClick: () => alert(`Hexagon n.${hexagon} has been clicked`)
+      // onClick: () => alert(`Hexagon n.${hexagon} has been clicked`)
     };
   };
 
@@ -52,7 +54,7 @@ function UpbeatGrid() {
       <text
         x="50%"
         y="50%"
-        fontSize={100}
+        fontSize={75}
         fontWeight="lighter"
         style={{ fill: "white" }}
         textAnchor="middle"
@@ -65,33 +67,46 @@ function UpbeatGrid() {
   const tryInvoke = (func, params = [], defaultValue = null) => {
     return isFunction(func) ? func(...params) : defaultValue;
   };
+  const bounds = {
+    left: -(gridWidth - containerWidth) <= 0 ? -(gridWidth - containerWidth) - 100 : 0,
+    top: -(gridHeight - containerHeight) <= 0 ? -(gridHeight - containerHeight) - 100 : 0,
+    // left: -(gridWidth - containerWidth),
+    // top: -(gridHeight - containerHeight),
+    right: -(gridWidth - containerWidth) <= 0 ? 100 : 0,
+    bottom: -(gridHeight - containerHeight) <= 0 ? 100 : 0,
+    // right: 0,
+    // bottom: 0,
+  };
 
   return (
-    <svg width={gridWidth} height={gridHeight} x={0} y={0}>
-      {hexagons.map((row, rIdx) => {
-        const rowDim = getRowDimensions(rIdx);
-        return <svg
-          key={rIdx}
-          width={rowDim.width}
-          height={rowDim.height}
-          y={rowDim.y}
-        >{row.map((col, cIdx) => {
-          const hexDim = getHexDimensions(rIdx, cIdx);
-          const _hexProps = tryInvoke(getHexProps(hexagons[rIdx][cIdx]), [hexagons[rIdx][cIdx]], getHexProps(hexagons[rIdx][cIdx]));
+    <Draggable bounds={bounds} >
+      {/* className={clsx((-(gridHeight - containerHeight) >= 0) && 'hexagons')} */}
+      <svg width={gridWidth} height={gridHeight} x={0} y={0} >
+        {hexagons.map((row, rIdx) => {
+          const rowDim = getRowDimensions(rIdx);
           return <svg
-            key={(cIdx) + (cols * rIdx)}
-            height={hexDim.height}
-            width={hexDim.width}
-            x={`${hexDim.x}px`}
-            y={`${hexDim.y}px`}
-          >
-            <Hexagon {..._hexProps} flatTop>
-              {tryInvoke(renderHexagonContent, [hexagons[rIdx][cIdx]], <tspan />)}
-            </Hexagon>
-          </svg>
-        })}</svg>
-      })}
-    </svg>
+            key={rIdx}
+            width={rowDim.width}
+            height={rowDim.height}
+            y={rowDim.y}
+          >{row.map((col, cIdx) => {
+            const hexDim = getHexDimensions(rIdx, cIdx);
+            const _hexProps = tryInvoke(getHexProps(hexagons[rIdx][cIdx]), [hexagons[rIdx][cIdx]], getHexProps(hexagons[rIdx][cIdx]));
+            return <svg
+              key={(cIdx) + (cols * rIdx)}
+              height={hexDim.height}
+              width={hexDim.width}
+              x={`${hexDim.x}px`}
+              y={`${hexDim.y}px`}
+            >
+              <Hexagon {..._hexProps} flatTop>
+                {tryInvoke(renderHexagonContent, [hexagons[rIdx][cIdx]], <tspan />)}
+              </Hexagon>
+            </svg>
+          })}</svg>
+        })}
+      </svg></Draggable >
+
   );
 }
 
