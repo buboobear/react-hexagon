@@ -1,18 +1,18 @@
 #root {
-	margin: 0 auto;
+  margin: 0 auto;
 }
 
 .grid-container {
-	width: 400px;
-	height: 400px;
-	overflow: hidden;
-	border: 1px solid white;
-	position: relative;
+  width: 400px;
+  height: 400px;
+  overflow: hidden;
+  border: 1px solid black;
+  position: relative;
 }
 
 .hexagons {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
